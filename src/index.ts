@@ -29,4 +29,26 @@ app.get('/', (c) => {
 
 app.get("/posts", (c) => c.json({posts:blogPosts}));
 
+app.get("/posts/:id", (c) => {
+  const id = c.req.param("id");
+  const post = blogPosts.find((p) => p.id === id);
+
+  if (post) {
+    return c.json(post);
+  } else {
+    return c.json({message: "not found this page"}, 404);
+  }
+});
+
+app.post("/posts", async (c) => {
+  const {title, content} = await c.req.json<{ 
+    title: string; 
+    content: string;
+  }>();
+  const newPost = { id: String(blogPosts.length + 1), title, content}; 
+
+  blogPosts = [...blogPosts, newPost];
+  return c.json(newPost, 201)
+});
+
 export default app
